@@ -1,0 +1,11 @@
+from fastapi import FastAPI
+
+app = FastAPI(
+    title="Leak Detector API",
+    description="Backend for ML-based financial anomaly detection",
+    version="0.1.0"
+)
+
+@app.get("/health)
+def health_check():
+    return {"status": "ok"}
