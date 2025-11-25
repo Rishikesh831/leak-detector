@@ -55,7 +55,7 @@ flowchart TD
 
 ### Core Components
 
-#### 1. **API Layer** (FastAPI/Flask)
+#### 1. **back Layer** (Fastback/Flask)
 - RESTful endpoints for frontend communication
 - File upload handling
 - Authentication & authorization
@@ -87,12 +87,12 @@ flowchart TD
 
 ---
 
-## 🔌 API Endpoints Specification
+## 🔌 back Endpoints Specification
 
 ### 1. Dashboard Endpoints
 
 ```
-GET /api/dashboard/metrics
+GET /back/dashboard/metrics
 Response: {
   "total_samples": 1500,
   "anomalies_detected": 23,
@@ -104,23 +104,23 @@ Response: {
 ### 2. Upload & Processing
 
 ```
-POST /api/upload
+POST /back/upload
 Body: FormData with file
 Response: {
   "upload_id": "uuid-123",
-  "filename": "water_data.csv",
+  "filename": "anamoly.csv",
   "rows": 1500,
   "columns": 12,
   "preview": [...first 10 rows...]
 }
 
-POST /api/process/{upload_id}
+POST /back/process/{upload_id}
 Response: {
   "job_id": "job-456",
   "status": "processing"
 }
 
-GET /api/process/status/{job_id}
+GET /back/process/status/{job_id}
 Response: {
   "status": "completed",
   "progress": 100,
@@ -132,7 +132,7 @@ Response: {
 ### 3. Anomaly Detection Results
 
 ```
-GET /api/anomalies?upload_id={id}&page=1&limit=20
+GET /back/anomalies?upload_id={id}&page=1&limit=20
 Response: {
   "total": 23,
   "page": 1,
@@ -153,7 +153,7 @@ Response: {
 ### 4. Explainability
 
 ```
-GET /api/explain/{anomaly_id}
+GET /back/explain/{anomaly_id}
 Response: {
   "anomaly_id": "anomaly-1",
   "shap_values": {
@@ -174,7 +174,7 @@ Response: {
 ### 5. Actions
 
 ```
-POST /api/anomalies/{id}/action
+POST /back/anomalies/{id}/action
 Body: {
   "action_type": "mark_reviewed" | "create_work_order" | "export"
   "notes": "Optional notes"
@@ -193,7 +193,7 @@ Response: {
 1. **Frontend**: User drops file → Preview shown → Clicks "Run ML"
 2. **Backend**: Receives file → Validates format → Stores in temp storage
 3. **Backend**: Starts async processing job → Returns job_id
-4. **Frontend**: Polls `/api/process/status/{job_id}` every 2 seconds
+4. **Frontend**: Polls `/back/process/status/{job_id}` every 2 seconds
 5. **Backend**: Processing completes → Updates job status
 6. **Frontend**: Redirects to Anomaly Table with results
 
@@ -212,16 +212,16 @@ Response: {
 
 **Why Backend First?**
 
-1. **Data Contract Definition** - Establish API contracts early so frontend knows exactly what to expect
+1. **Data Contract Definition** - Establish back contracts early so frontend knows exactly what to expect
 2. **ML Model Integration** - Core value is in the ML model; get it working first
 3. **Testing & Validation** - Easier to test backend logic independently with tools like Postman/Thunder Client
-4. **Parallel Development** - Frontend can use mock data based on API specs while backend develops real implementation
+4. **Parallel Development** - Frontend can use mock data based on back specs while backend develops real implementation
 
 ### 📋 **Suggested Development Order**
 
 #### Phase 1: Backend Foundation (Week 1)
 ```
-✓ Set up FastAPI/Flask project structure
+✓ Set up Fastapi/Flask project structure
 ✓ Implement file upload endpoint
 ✓ Create data validation pipeline
 ✓ Integrate ML model for basic inference
@@ -241,7 +241,7 @@ Response: {
 ```
 ✓ Set up React/Vue project
 ✓ Build upload page connecting to backend
-✓ Create anomaly table with real API data
+✓ Create anomaly table with real back data
 ✓ Implement dashboard with metrics
 ✓ Build explanation page with SHAP viz
 ```
@@ -259,10 +259,10 @@ Response: {
 
 For **solo developers** or **small teams**, consider:
 
-1. **Define API contracts** (using OpenAPI/Swagger)
-2. **Build frontend with mock data** (matching API contract)
+1. **Define back contracts** (using Openback/Swagger)
+2. **Build frontend with mock data** (matching back contract)
 3. **Develop backend** (implementing the contract)
-4. **Integrate** (swap mocks for real API calls)
+4. **Integrate** (swap mocks for real back calls)
 
 This allows you to:
 - Visualize the UX early
@@ -275,7 +275,7 @@ This allows you to:
 ## 🛠️ Technology Stack Recommendations
 
 ### Backend
-- **Framework**: FastAPI (Python) - async, fast, auto-docs
+- **Framework**: Fastback (Python) - async, fast, auto-docs
 - **ML**: scikit-learn, XGBoost, SHAP
 - **Database**: PostgreSQL (production) or SQLite (MVP)
 - **File Storage**: Local filesystem or S3
@@ -286,18 +286,18 @@ This allows you to:
 - **Charts**: Chart.js or Recharts for line charts
 - **Tables**: TanStack Table (React Table)
 - **SHAP Viz**: D3.js or Plotly
-- **State**: React Query for API caching
+- **State**: React Query for back caching
 
 ---
 
 ## 📝 Next Steps
 
 1. **Review wireframes** - Ensure all stakeholders agree on UI flow
-2. **Finalize API contracts** - Document all endpoints with request/response formats
-3. **Set up backend project** - Initialize FastAPI/Flask with basic structure
+2. **Finalize back contracts** - Document all endpoints with request/response formats
+3. **Set up backend project** - Initialize Fastback/Flask with basic structure
 4. **Integrate ML model** - Load and test your anomaly detection model
 5. **Build MVP endpoints** - Upload, process, and results endpoints
-6. **Create frontend** - Build pages connecting to backend APIs
+6. **Create frontend** - Build pages connecting to backend backs
 
 ---
 
@@ -305,11 +305,11 @@ This allows you to:
 
 | Page | Primary Backend Endpoint | Key Data |
 |------|-------------------------|----------|
-| Executive Dashboard | `GET /api/dashboard/metrics` | KPIs, stats, recent anomalies |
-| Upload Page | `POST /api/upload`, `POST /api/process/{id}` | File handling, job status |
-| Anomaly Table | `GET /api/anomalies` | Paginated anomaly list |
-| Leak Explanation | `GET /api/explain/{id}` | SHAP values, feature data |
-| Action Panel | `POST /api/anomalies/{id}/action` | Action logging |
+| Executive Dashboard | `GET /back/dashboard/metrics` | KPIs, stats, recent anomalies |
+| Upload Page | `POST /back/upload`, `POST /back/process/{id}` | File handling, job status |
+| Anomaly Table | `GET /back/anomalies` | Paginated anomaly list |
+| Leak Explanation | `GET /back/explain/{id}` | SHAP values, feature data |
+| Action Panel | `POST /back/anomalies/{id}/action` | Action logging |
 
 ---
 
