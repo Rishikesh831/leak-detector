@@ -1,9 +1,12 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from pydantic import BaseModel, Field
 from typing import List, Any
+from sqlalchemy.orm import Session
 import pandas as pd
-import uuid
 import io
+
+from database import get_db, Upload
+from storage import get_storage_service
 
 router = APIRouter()
 
@@ -18,12 +21,16 @@ class UploadResponse(BaseModel):
 
 
 @router.post("/upload", response_model=UploadResponse)
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
     """
-    Upload a CSV file for water leak detection analysis.
+    Upload a CSV file for leak detection analysis.
     
     Args:
         file: CSV file to upload
+        db: Database session (injected)
         
     Returns:
         UploadResponse: Upload metadata and data preview
@@ -42,22 +49,42 @@ async def upload_file(file: UploadFile = File(...)):
         # Parse CSV using pandas
         df = pd.read_csv(io.BytesIO(contents))
         
-        # Generate unique upload ID
-        upload_id = str(uuid.uuid4())
+        # Validate CSV is not empty
+        if df.empty:
+            raise HTTPException(status_code=400, detail="The uploaded CSV file is empty")
         
         # Get rows and columns count
         rows, columns = df.shape
+        
+        # Reset file pointer for storage
+        file.file.seek(0)
+        await file.seek(0)
+        
+        # Save file using storage service
+        storage_service = get_storage_service()
+        file_path, file_size = await storage_service.save_file(file)
+        
+        # Create database record
+        upload = Upload(
+            filename=file.filename,
+            rows_count=rows,
+            columns_count=columns,
+            file_path=file_path,
+            status="uploaded"
+        )
+        
+        db.add(upload)
+        db.commit()
+        db.refresh(upload)
         
         # Get preview (first 10 rows as list of lists)
         preview_df = df.head(10)
         preview = preview_df.values.tolist()
         
-        # TODO: Store the file and metadata in database
-        # Example:
-        # await db.save_upload(upload_id, file.filename, df)
+        print(f"✅ Upload successful: {upload.id} - {file.filename} ({rows} rows)")
         
         return UploadResponse(
-            upload_id=upload_id,
+            upload_id=str(upload.id),
             filename=file.filename,
             rows=rows,
             columns=columns,
@@ -69,4 +96,6 @@ async def upload_file(file: UploadFile = File(...)):
     except pd.errors.ParserError:
         raise HTTPException(status_code=400, detail="Invalid CSV file format")
     except Exception as e:
+        db.rollback()
+        print(f"❌ Upload error: {e}")
         raise HTTPException(status_code=500, detail=f"Error processing file: {str(e)}")
