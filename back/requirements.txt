@@ -1,13 +1,28 @@
+# FastAPI and web server
 fastapi
 uvicorn
 pydantic
+python-multipart
+
+# Data processing
 pandas
 numpy
+
+# Machine Learning
 scikit-learn
 xgboost
 shap
-python-multipart
+tensorflow  # For Keras autoencoder model
+joblib
+
+# Database
 sqlalchemy
 psycopg2-binary
+alembic
+
+# Background jobs (optional)
 redis
 rq
+
+# File operations
+aiofiles
