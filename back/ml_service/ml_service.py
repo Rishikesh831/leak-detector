@@ -52,17 +52,17 @@ class MLService:
     def load_models(self):
         """Load all ML models from disk"""
         try:
-            print("🔄 Loading ML models...")
+            print("[INFO] Loading ML models...")
             
             # Load scaler
             scaler_path = ML_MODELS_DIR / "scaler_std.joblib"
             self.scaler = joblib.load(scaler_path)
-            print(f"  ✅ Scaler loaded (expects {self.scaler.n_features_in_} features)")
+            print(f"  [OK] Scaler loaded (expects {self.scaler.n_features_in_} features)")
             
             # Load supervised classifier
             supervised_path = ML_MODELS_DIR / "supervised_model.joblib"
             self.supervised_model = joblib.load(supervised_path)
-            print(f"  ✅ Supervised model loaded: {type(self.supervised_model).__name__}")
+            print(f"  [OK] Supervised model loaded: {type(self.supervised_model).__name__}")
             
             # Load autoencoder
             autoencoder_path = ML_MODELS_DIR / "optimal_autoencoder_model.keras"
@@ -70,15 +70,15 @@ class MLService:
                 self.autoencoder = tf.keras.models.load_model(autoencoder_path)
             else:
                 self.autoencoder = keras.models.load_model(autoencoder_path)
-            print(f"  ✅ Autoencoder loaded: {self.autoencoder.input_shape}")
+            print(f"  [OK] Autoencoder loaded: {self.autoencoder.input_shape}")
             
             # Initialize SHAP explainer (lazy loading)
             self.shap_explainer = None
             
-            print("✅ All ML models loaded successfully")
+            print("[OK] All ML models loaded successfully")
             
         except Exception as e:
-            print(f"❌ Error loading ML models: {e}")
+            print(f"[ERROR] Error loading ML models: {e}")
             raise e
     
     def preprocess_data(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:

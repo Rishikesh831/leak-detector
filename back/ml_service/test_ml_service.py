@@ -1,4 +1,4 @@
-"""
+﻿"""
 Test script for ML Service
 Run this to verify models load correctly
 """
@@ -9,7 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pandas as pd
-from ml.ml_service import get_ml_service
+from ml_service import get_ml_service
 
 def test_model_loading():
     """Test that all models load successfully"""
@@ -19,10 +19,10 @@ def test_model_loading():
     
     try:
         service = get_ml_service()
-        print("✅ ML Service initialized successfully")
+        print("[OK] ML Service initialized successfully")
         return True
     except Exception as e:
-        print(f"❌ Failed to initialize ML service: {e}")
+        print(f"[FAIL] Failed to initialize ML service: {e}")
         return False
 
 
@@ -36,7 +36,7 @@ def test_preprocessing():
         # Load sample data
         csv_path = Path(__file__).parent.parent.parent / "ml" / "saas_billing_train.csv"
         df = pd.read_csv(csv_path)
-        print(f"✅ Loaded CSV: {df.shape[0]} rows, {df.shape[1]} columns")
+        print(f"[OK] Loaded CSV: {df.shape[0]} rows, {df.shape[1]} columns")
         
         # Test with first 100 rows
         df_sample = df.head(100)
@@ -44,14 +44,14 @@ def test_preprocessing():
         service = get_ml_service()
         df_clean, df_scaled = service.preprocess_data(df_sample)
         
-        print(f"✅ Preprocessing successful")
+        print(f"[OK] Preprocessing successful")
         print(f"   - Cleaned data: {df_clean.shape}")
         print(f"   - Scaled features: {df_scaled.shape}")
         print(f"   - Expected features: {service.scaler.n_features_in_}")
         
         return True
     except Exception as e:
-        print(f"❌ Preprocessing failed: {e}")
+        print(f"[FAIL] Preprocessing failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -74,7 +74,7 @@ def test_anomaly_detection():
         # Detect anomalies with threshold 0.5
         anomalies = service.detect_anomalies(df_clean, df_scaled, threshold=0.5)
         
-        print(f"✅ Anomaly detection successful")
+        print(f"[OK] Anomaly detection successful")
         print(f"   - Anomalies found: {len(anomalies)}")
         
         if anomalies:
@@ -87,14 +87,14 @@ def test_anomaly_detection():
         
         return True
     except Exception as e:
-        print(f"❌ Anomaly detection failed: {e}")
+        print(f"[FAIL] Anomaly detection failed: {e}")
         import traceback
         traceback.print_exc()
         return False
 
 
 if __name__ == "__main__":
-    print("\n🚀 Starting ML Service Tests\n")
+    print("\n[TEST] Starting ML Service Tests\n")
     
     results = []
     
@@ -109,14 +109,14 @@ if __name__ == "__main__":
     print("="*60)
     
     for test_name, passed in results:
-        status = "✅ PASS" if passed else "❌ FAIL"
+        status = "[OK] PASS" if passed else "[FAIL] FAIL"
         print(f"{status} - {test_name}")
     
     all_passed = all(result[1] for result in results)
     
     if all_passed:
-        print("\n🎉 All tests passed! ML service is ready.")
+        print("\n[SUCCESS] All tests passed! ML service is ready.")
     else:
-        print("\n⚠️ Some tests failed. Please check the errors above.")
+        print("\n[WARN] Some tests failed. Please check the errors above.")
     
     sys.exit(0 if all_passed else 1)
